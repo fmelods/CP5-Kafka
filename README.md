@@ -2,6 +2,13 @@
 
 Projeto Java Spring Boot que demonstra o uso de RabbitMQ e Apache Kafka para processamento assíncrono e streaming de eventos.
 
+## Integrantes do Grupo
+
+- Arthur Ramos Dos Santos - RM558798  
+- Cauã Sanches de Santana - RM558317  
+- Felipe Melo e Sousa - RM556099  
+- Heitor Romero da Rocha - RM558301
+
 ## Arquitetura
 
 ### RabbitMQ (Tarefas Assíncronas)
