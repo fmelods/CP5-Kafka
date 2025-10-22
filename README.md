@@ -1,169 +1,121 @@
-# Sistema de E-commerce com RabbitMQ e Kafka
+# 🛒 **E-commerce com Apache Kafka — Projeto FIAP**
 
-Projeto Java Spring Boot que demonstra o uso de RabbitMQ e Apache Kafka para processamento assíncrono e streaming de eventos.
+Projeto desenvolvido em **Java + Spring Boot** demonstrando o uso do **Apache Kafka** para processamento assíncrono e comunicação entre microsserviços em um ambiente de e-commerce.
 
-## Integrantes do Grupo
+---
 
-- Arthur Ramos Dos Santos - RM558798  
-- Cauã Sanches de Santana - RM558317  
-- Felipe Melo e Sousa - RM556099  
-- Heitor Romero da Rocha - RM558301
+## 👥 **Integrantes do Grupo**
 
-## Arquitetura
+- **Arthur Ramos Dos Santos** — RM558798  
+- **Cauã Sanches de Santana** — RM558317  
+- **Felipe Melo e Sousa** — RM556099  
+- **Heitor Romero da Rocha** — RM558301  
 
-### RabbitMQ (Tarefas Assíncronas)
-- **OrderProducer**: Publica pedidos para processamento
-- **PaymentProducer**: Processa notificações de pagamento
-- **EmailConsumer**: Envia emails via API externa
-- **InventoryConsumer**: Atualiza estoque consultando API de fornecedores
+---
 
-### Kafka (Streaming de Eventos)
-- **AuditProducer**: Registra eventos de auditoria
-- **AnalyticsProducer**: Envia métricas para analytics
-- **AuditConsumer**: Persiste logs em arquivo e analisa segurança
-- **AnalyticsConsumer**: Processa métricas em tempo real
+## ⚙️ **Arquitetura**
 
-## Requisitos
+A aplicação é baseada em **eventos Kafka** e implementa dois produtores e dois consumidores diferentes.
 
-- Java 21
-- Docker e Docker Compose
-- Gradle
+### **Produtores**
+- **OrderProducer** — Publica mensagens no tópico `orders` quando um novo pedido é criado.  
+- **PaymentProducer** — Publica mensagens no tópico `payments` simulando uma integração com um gateway de pagamento.
 
-## Como Executar
+### **Consumidores**
+- **OrderConsumer** — Recebe pedidos do tópico `orders` e simula o processamento, podendo acionar endpoints externos ou APIs REST.  
+- **NotificationConsumer** — Recebe informações do tópico `payments` e simula o envio de e-mails de confirmação para o cliente (como se chamasse um servidor de e-mail externo).
 
-### 1. Subir a infraestrutura
+---
 
-\`\`\`bash
+## 🧩 **Fluxo do Sistema**
+
+1. O cliente envia um **POST** para `/api/orders`.  
+2. O **OrderProducer** publica o pedido no tópico `orders`.  
+3. O **OrderConsumer** consome essa mensagem e processa o pedido.  
+4. Após processar, o sistema aciona o **PaymentProducer**, que publica a informação no tópico `payments`.  
+5. O **NotificationConsumer** consome o pagamento e simula o envio de uma notificação (ex: e-mail).  
+6. Os pedidos podem ser consultados via **GET `/api/orders`**.
+
+---
+
+## 🧠 **Conceitos Aplicados**
+
+- Comunicação assíncrona com **Apache Kafka**  
+- **Produtores e consumidores independentes**  
+- Serialização de objetos em **JSON**  
+- **Spring Boot + Spring Kafka**  
+- Processamento orientado a eventos  
+- Simulação de integrações externas (API / e-mail)
+
+---
+
+## 🛠️ **Requisitos**
+
+- **Java 17+**  
+- **Docker e Docker Compose**  
+- **Gradle**
+
+---
+
+## 🚀 **Como Executar o Projeto**
+
+### 1. Subir a infraestrutura do Kafka
+```bash
 docker-compose up -d
-\`\`\`
+```
 
-### 2. Verificar serviços
-
-\`\`\`bash
+### 2. Verificar se os serviços estão rodando
+```bash
 docker-compose ps
-\`\`\`
+```
 
-### 3. Acessar interfaces
+### 3. Acessar as interfaces
+- **Kafka UI:** http://localhost:8090  
+- **API:** http://localhost:8080/api/orders  
 
-- RabbitMQ Management: http://localhost:15672 (guest/guest)
-- Kafka UI: http://localhost:8090
-
-### 4. Executar aplicação
-
-\`\`\`bash
+### 4. Executar a aplicação
+```bash
 ./gradlew bootRun
-\`\`\`
+```
 
-## Testando
+---
 
-### Criar um pedido
+## 🧪 **Testando a API**
 
-\`\`\`bash
-curl -X POST http://localhost:8080/api/orders \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customerId": "customer-123",
-    "customerEmail": "cliente@example.com",
+### Criar um novo pedido (Producer)
+```bash
+curl -X POST http://localhost:8080/api/orders   -H "Content-Type: application/json"   -d '{
+    "customerId": "12345",
+    "customerEmail": "cliente@exemplo.com",
     "items": [
-      {
-        "productName": "Notebook Dell",
-        "quantity": 1,
-        "price": 3500.00
-      },
-      {
-        "productName": "Mouse Logitech",
-        "quantity": 2,
-        "price": 150.00
-      }
+      {"productName": "Notebook Dell", "quantity": 1, "price": 3500.00},
+      {"productName": "Mouse Logitech", "quantity": 2, "price": 150.00}
     ]
   }'
-\`\`\`
+```
 
-## Observando o Fluxo
+### Consultar pedidos (Consumer)
+```bash
+curl http://localhost:8080/api/orders
+```
 
-1. Verifique os logs da aplicação para ver os produtores e consumidores em ação
-2. Acesse o RabbitMQ Management para ver as filas e mensagens
-3. Acesse o Kafka UI para ver os tópicos e offsets
-4. Verifique o arquivo `audit-logs.txt` criado pelo AuditConsumer
+---
 
-## Conceitos Implementados
+## 🧾 **Estrutura do Projeto**
 
-### RabbitMQ
-- Topic Exchange para roteamento flexível
-- Múltiplas filas com bindings
-- Conversão JSON automática
-- ACK automático de mensagens
-
-### Kafka
-- Tópicos com múltiplas partições
-- Consumer Groups
-- Serialização JSON
-- Offset management
-- Processamento em tempo real
-
-## Estrutura do Projeto
-
-\`\`\`
+```
 src/main/java/br/com/fiap/ecommerce/
-├── config/              # Configurações RabbitMQ e Kafka
-├── model/               # Modelos de dados
-├── producer/
-│   ├── rabbitmq/       # Produtores RabbitMQ
-│   └── kafka/          # Produtores Kafka
-├── consumer/
-│   ├── rabbitmq/       # Consumidores RabbitMQ
-│   └── kafka/          # Consumidores Kafka
-└── controller/         # REST Controllers
-\`\`\`
+├── config/             # Configuração do Kafka
+├── controller/         # Endpoints REST
+├── model/              # Modelos de dados (Order, Item)
+├── producer/           # Produtores Kafka (Order e Payment)
+├── consumer/           # Consumidores Kafka (Order e Notification)
+└── EcommerceApplication.java
+```
 
-## Autor
+---
 
-Projeto desenvolvido para demonstração de conceitos de mensageria e streaming de eventos.
-\`\`\`
+## 💡 **Resumo**
 
-```text file=".gitignore"
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-
-### Kafka & RabbitMQ ###
-kafka-data/
-kraft-combined-logs/
-
-### Logs ###
-*.log
-audit-logs.txt
+Este projeto demonstra o uso de **Apache Kafka** como mensageria central em um sistema de e-commerce distribuído.  
+A aplicação processa pedidos e pagamentos de forma **assíncrona**, simulando chamadas externas e automação de notificações.
