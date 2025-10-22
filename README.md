@@ -1,7 +1,7 @@
 # 🛒 Projeto E-commerce — Apache Kafka
 
 ## 📘 Descrição do Projeto
-Este projeto foi desenvolvido como parte da disciplina de **Arquitetura de Microsserviços e Mensageria** da **FIAP**.
+Este projeto foi desenvolvido como parte da disciplina de **Java Advanced** da **FIAP**.
 
 O objetivo é demonstrar o uso do **Apache Kafka** em um sistema de e-commerce, utilizando **Java 17** e **Spring Boot 3.4**.  
 A aplicação mostra como diferentes serviços podem se comunicar de forma **assíncrona**, **desacoplada** e **escalável**, simulando o fluxo de criação de pedidos, processamento de pagamentos, auditoria e análise de dados.
